@@ -1,2 +1,4 @@
 # binary files
 *.yc
+
+secrets/
