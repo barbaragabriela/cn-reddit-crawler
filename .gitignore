@@ -1,4 +1,6 @@
 # binary files
-*.yc
+*.pyc
 
 secrets/
+DATA/
+oauth.ini
