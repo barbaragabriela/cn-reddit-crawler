@@ -2,7 +2,7 @@ import praw
 import OAuth2Util
 
 
-LIMIT = 10
+LIMIT = None
 
 r = praw.Reddit("Useragent")
 o = OAuth2Util.OAuth2Util(r)
