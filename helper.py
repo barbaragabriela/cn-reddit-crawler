@@ -12,7 +12,10 @@ def get_history(username):
     combined = list(commented_subs)
     combined.extend(submitted_subs)
 
-    return combined
+    unique_subreddits = set(combined)
+    unique_subreddits = list(unique_subreddits)
+
+    return unique_subreddits
 
 
 def add_relationship(relationships, subreddit_list):
@@ -32,10 +35,11 @@ def add_relationship(relationships, subreddit_list):
 
 
 def get_subreddit_list(username):
-    subreddits = []    
-    with open('DATA/users/username.txt') as file:
+    subreddits = []
+    print username
+    with open('DATA/users/sub_' + username + '.txt') as file:
         for row in file:
-            subreddits.append(row)
+            subreddits.append(row.rstrip())
 
     return subreddits
 
@@ -49,8 +53,8 @@ def collect_data():
     top_users = users.get_top_users()
 
     for username in top_users:
-        subreddits = helper.get_history(username)
-        helper.save_to_file(username, subreddits)
+        subreddits = get_history(username)
+        save_to_file(username, subreddits)
 
 
 def save_to_file(username, subreddit_list):
@@ -60,4 +64,36 @@ def save_to_file(username, subreddit_list):
     file = open('DATA/sub_{}.txt'.format(username), 'w')
     for subreddit in subreddit_list:
         file.write(subreddit + '\n')
+    file.close()
+
+
+def add_labels(labels, relationships, ID):
+    '''
+    Create labels for nodes so pajek works
+    '''
+    for node in relationships:
+        if node in labels:
+            continue
+        labels[node] = ID
+        ID += 1
+
+    return ID
+
+
+def write_pajek(labels, relationships):
+    '''
+    Writes all relationships to a pajek file
+    '''
+    file = open('pajek/top_users.net', 'w')
+    file.write('*Vertices ')
+    file.write(str(len(labels)))
+    file.write('\n')
+    for label in labels:
+        file.write(str(labels[label]) + ' ' + label + '\n')
+    file.write('*Edges')
+    file.write('\n')
+    for node in relationships:
+        for connection in relationships[node]:
+            file.write(str(labels[node]) + ' ' + str(labels[connection]) + '\n')
+
     file.close()
