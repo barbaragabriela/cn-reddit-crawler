@@ -1,4 +1,7 @@
 import wrapper
+import users
+
+import json
 import itertools as it
 
 
@@ -15,7 +18,7 @@ def get_history(username):
     unique_subreddits = set(combined)
     unique_subreddits = list(unique_subreddits)
 
-    return unique_subreddits
+    return unique_subreddits, commented_subs, submitted_subs
 
 
 def add_relationship(relationships, subreddit_list):
@@ -30,18 +33,30 @@ def add_relationship(relationships, subreddit_list):
             if subset[1] not in relationships[subset[0]]:
                 relationships[subset[0]].append(subset[1])
 
-    # print relationships
     return relationships
 
 
 def get_subreddit_list(username):
+    '''
+    Returns the lists of subreddits combined and classified by comments or posts
+    '''
     subreddits = []
-    print username
-    with open('DATA/users/sub_' + username + '.txt') as file:
+    commented_subs = []
+    submitted_subs = []
+
+    with open('DATA/users/combined/sub_' + username + '.txt') as file:
         for row in file:
             subreddits.append(row.rstrip())
 
-    return subreddits
+    with open('DATA/users/comments/sub_' + username + '.txt') as file:
+        for row in file:
+            commented_subs.append(row.rstrip())
+
+    with open('DATA/users/posts/sub_' + username + '.txt') as file:
+        for row in file:
+            submitted_subs.append(row.rstrip())
+
+    return subreddits, commented_subs, submitted_subs
 
 
 def collect_data():
@@ -53,15 +68,17 @@ def collect_data():
     top_users = users.get_top_users()
 
     for username in top_users:
-        subreddits = get_history(username)
-        save_to_file(username, subreddits)
+        subreddits, commented_subs, submitted_subs = get_history(username)
+        save_to_file(username, subreddits, 'combined')
+        save_to_file(username, commented_subs, 'comments')
+        save_to_file(username, submitted_subs, 'posts')
 
 
-def save_to_file(username, subreddit_list):
+def save_to_file(username, subreddit_list, list_type):
     '''
     Writes to file all the subreddits a user interacts with
     '''
-    file = open('DATA/sub_{}.txt'.format(username), 'w')
+    file = open('DATA/users/{}/sub_{}.txt'.format(list_type, username), 'w')
     for subreddit in subreddit_list:
         file.write(subreddit + '\n')
     file.close()
@@ -80,11 +97,11 @@ def add_labels(labels, relationships, ID):
     return ID
 
 
-def write_pajek(labels, relationships):
+def write_pajek(labels, relationships, filename):
     '''
     Writes all relationships to a pajek file
     '''
-    file = open('pajek/top_users.net', 'w')
+    file = open('pajek/{}.net'.format(filename), 'w')
     file.write('*Vertices ')
     file.write(str(len(labels)))
     file.write('\n')

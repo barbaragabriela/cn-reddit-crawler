@@ -1,6 +1,5 @@
 import csv
 
-import wrapper
 
 def get_top_users():
     top_users = {}
