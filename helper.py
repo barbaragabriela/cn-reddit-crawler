@@ -128,3 +128,46 @@ def write_pajek(labels, relationships, filename):
             file.write(str(labels[node]) + ' ' + str(labels[connection]) + '\n')
 
     file.close()
+
+
+def write_json(labels, relationships, filename):
+    '''
+    Writes all relationships to json file used by sigma.js
+    '''
+    degrees, average = node_degree(relationships, labels)
+    print "degrees"
+    print degrees
+    print "average:", average
+
+    nodes = []
+    for label in labels:
+        node = {}
+        node['id'] = 'n{}'.format(labels[label] - 1)
+        node['label'] = label
+        node['x'] = random.random()
+        node['y'] = random.random()
+        node['size'] = degrees[labels[label] - 1]
+        print node
+        break
+        # nodes.append(node)
+
+    edges = []
+    i = 0
+    for node in relationships:
+        for connection in relationships[node]:
+            edge = {}
+            edge['id'] = 'n{}'.format(i)
+            edge['source'] = str(labels[node] - 1)
+            edge['target'] = str(labels[connection] - 1)
+            i += 1
+            print edge
+            break
+            # edges.append(edge)
+        break
+
+    # data = {}
+    # data['nodes'] = nodes
+    # data['edges'] = edges
+    # json_data = json.dumps(data)
+    # with open('json/{}.json'.format(filename), 'w') as outfile:
+    #     json.dump(data, outfile)
