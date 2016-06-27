@@ -2,6 +2,7 @@ import wrapper
 import users
 
 import json
+import random
 import itertools as it
 
 
@@ -135,10 +136,9 @@ def write_json(labels, relationships, filename):
     Writes all relationships to json file used by sigma.js
     '''
     degrees, average = node_degree(relationships, labels)
-    print "degrees"
-    print degrees
-    print "average:", average
-
+    min_node_size = 1
+    max_node_size = 8
+    pool = max(degrees) / 8.0
     nodes = []
     for label in labels:
         node = {}
@@ -146,10 +146,8 @@ def write_json(labels, relationships, filename):
         node['label'] = label
         node['x'] = random.random()
         node['y'] = random.random()
-        node['size'] = degrees[labels[label] - 1]
-        print node
-        break
-        # nodes.append(node)
+        node['size'] = int(degrees[labels[label] - 1] / pool) + 1
+        nodes.append(node)
 
     edges = []
     i = 0
@@ -157,17 +155,14 @@ def write_json(labels, relationships, filename):
         for connection in relationships[node]:
             edge = {}
             edge['id'] = 'n{}'.format(i)
-            edge['source'] = str(labels[node] - 1)
-            edge['target'] = str(labels[connection] - 1)
+            edge['source'] = 'n{}'.format(str(labels[node] - 1))
+            edge['target'] = 'n{}'.format(str(labels[connection] - 1))
+            edges.append(edge)
             i += 1
-            print edge
-            break
-            # edges.append(edge)
-        break
 
-    # data = {}
-    # data['nodes'] = nodes
-    # data['edges'] = edges
-    # json_data = json.dumps(data)
-    # with open('json/{}.json'.format(filename), 'w') as outfile:
-    #     json.dump(data, outfile)
+    data = {}
+    data['nodes'] = nodes
+    data['edges'] = edges
+    json_data = json.dumps(data)
+    with open('json/{}.json'.format(filename), 'w') as outfile:
+        json.dump(data, outfile)
