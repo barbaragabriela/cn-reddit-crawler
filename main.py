@@ -30,8 +30,7 @@ def main():
             c_last_label_id = 1
             p_last_label_id = 1
             # Get users
-            # top_users = users.get_top_users()
-            top_users = ['barbss', 'metalan', 'fadeblack13']
+            top_users = users.get_top_users()
 
             # Loop through users and get the list of subreddits they comment and post
             for username in top_users:
