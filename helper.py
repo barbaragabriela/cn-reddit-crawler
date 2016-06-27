@@ -59,6 +59,20 @@ def get_subreddit_list(username):
     return subreddits, commented_subs, submitted_subs
 
 
+def node_degree(relationships, labels):
+    '''
+    Function that returns the degrees of a graph and the average degree
+    '''
+    degrees = [0] * len(labels)
+    average = 0
+    for node in relationships:
+        number_of_nodes = len(relationships[node])
+        average += number_of_nodes
+        degrees[labels[node] - 1] = number_of_nodes
+    average = average/len(labels)
+    return degrees, average
+
+
 def collect_data():
     '''
     Gets all the subreddit list the users interact with
