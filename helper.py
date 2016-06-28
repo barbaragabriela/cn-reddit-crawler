@@ -4,7 +4,7 @@ import users
 import json
 import random
 import itertools as it
-
+from collections import defaultdict
 
 def get_history(username):
     '''
@@ -58,6 +58,37 @@ def get_subreddit_list(username):
             submitted_subs.append(row.rstrip())
 
     return subreddits, commented_subs, submitted_subs
+
+
+def load_data_from_tagged_subreddits():
+    relationships = defaultdict(list)
+    labels = {}
+    ID = 1
+
+    with open('json/tagged_subs.json') as data_file:
+        data = json.load(data_file)
+
+    for tag in data:
+        subs = []
+        for sub in data[tag]:
+            subreddit = sub[len("/r/"):].strip("/")
+            # subreddit = sub.strip("/r/")
+            subs.append(subreddit)
+
+        for node in subs:
+            if node not in labels:
+                labels[node] = ID
+                ID += 1
+
+        for subset in it.permutations(subs, 2):
+            if subset[1] in relationships:
+                if subset[0] in relationships[subset[1]]:
+                    continue
+            else:
+                if subset[1] not in relationships[subset[0]]:
+                    relationships[subset[0]].append(subset[1])
+
+    return relationships, labels
 
 
 def node_degree(relationships, labels):
@@ -136,8 +167,6 @@ def write_json(labels, relationships, filename):
     Writes all relationships to json file used by sigma.js
     '''
     degrees, average = node_degree(relationships, labels)
-    min_node_size = 1
-    max_node_size = 8
     pool = max(degrees) / 8.0
     nodes = []
     for label in labels:
