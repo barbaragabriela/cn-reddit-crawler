@@ -13,6 +13,7 @@ def main():
         print '2) Generate pajek files'
         print '3) Generate network from metareddit subreddits'
         print '4) Generate network for one day of reddit'
+        print '5) Top users metrics'
         print '0) Exit'
         print 'Choice: '
         option = raw_input()
@@ -74,6 +75,9 @@ def main():
             relationships, labels = extra.add_relationship(user_and_subreddits)
             filename = '1day_comments.net'
             helper.write_pajek(labels, relationships, filename)
+
+        elif option == '5':
+            users.get_top_users_with_metrics()
 
 
 if __name__ == '__main__':
